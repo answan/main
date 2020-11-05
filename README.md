@@ -287,7 +287,7 @@ http PATCH http://localhost:8083/payments/4 price=200 process="OrderCancelled"  
 
 ```
 #Reward 서비스 재기동
-cd pay
+cd reward
 mvn spring-boot:run
 
 #결제취소하기(pay)
