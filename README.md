@@ -94,7 +94,7 @@ ver.Answan
 
 ### 폴리시의 이동
 
-![image](https://user-images.githubusercontent.com/73699193/97982413-19bf9880-1e17-11eb-9720-cd82cf1060ff.png)
+![image](https://user-images.githubusercontent.com/52647474/98244875-72c43380-1fb3-11eb-8b68-09b052c7f1df.png)
 
 ### 컨텍스트 매핑 (점선은 Pub/Sub, 실선은 Req/Resp)
 
