@@ -63,21 +63,21 @@ ver.Answan
 ![image](https://user-images.githubusercontent.com/52647474/98241971-0d6e4380-1faf-11eb-9615-4dfd74f6581a.png)
 
 ### 부적격 이벤트 탈락
-
+![image](https://user-images.githubusercontent.com/52647474/98242134-54f4cf80-1faf-11eb-8cca-d920cf733e8b.png)
 
     - 과정중 도출된 잘못된 도메인 이벤트들을 걸러내는 작업을 수행함
-	- 폰종류가선택됨, 결제버튼클릭됨, 배송수량선택됨, 배송일자선택됨  :  UI 의 이벤트이지, 업무적인 의미의 이벤트가 아니라서 제외
-	- 배송취소됨, 메시지발송됨  :  계획된 사업 범위 및 프로젝트에서 벗어서난다고 판단하여 제외
+	- 폰종류가선택됨, 결제버튼클릭됨, 배송수량선택됨, 배송일자선택됨,Reward 승인클릭 :  UI 의 이벤트이지, 업무적인 의미의 이벤트가 아니라서 제외
+	- 배송취소됨, 메시지발송됨,취소메시지 발송  :  계획된 사업 범위 및 프로젝트에서 벗어서난다고 판단하여 제외
 	- 주문정보전달됨  :  주문됨을 선택하여 제외
 	
 
 ### 액터, 커맨드 부착하여 읽기 좋게
-![image](https://user-images.githubusercontent.com/73699193/97982030-82f2dc00-1e16-11eb-821d-27351387f8ad.png)
+![image](https://user-images.githubusercontent.com/52647474/98242215-7655bb80-1faf-11eb-9385-383b7ed2e7b4.png)
 
 ### 어그리게잇으로 묶기
-![image](https://user-images.githubusercontent.com/73699193/97982108-a158d780-1e16-11eb-9270-6e9646268fd1.png)
+![image](https://user-images.githubusercontent.com/52647474/98242269-89688b80-1faf-11eb-89c7-c7370db3b7ca.png)
 
-    - 주문, 대리점관리, 결제 어그리게잇을 생성하고 그와 연결된 command 와 event 들에 의하여 트랜잭션이 유지되어야 하는 단위로 그들 끼리 묶어줌
+    - 주문, 대리점관리, 결제, Reward 어그리게잇을 생성하고 그와 연결된 command 와 event 들에 의하여 트랜잭션이 유지되어야 하는 단위로 그들 끼리 묶어줌
 
 ### 바운디드 컨텍스트로 묶기
 
@@ -90,7 +90,7 @@ ver.Answan
 
 ### 폴리시 부착 (괄호는 수행주체, 폴리시 부착을 둘째단계에서 해놔도 상관 없음. 전체 연계가 초기에 드러남)
 
-![image](https://user-images.githubusercontent.com/73699193/97982278-e3821900-1e16-11eb-97f4-fa2f59fc7ae0.png)
+![image](https://user-images.githubusercontent.com/52647474/98242443-d8162580-1faf-11eb-85a5-12d0db71ab51.png)
 
 ### 폴리시의 이동
 
