@@ -213,7 +213,9 @@ gateway 테스트
 ```
 http POST http://gateway:8080/orders item=test qty=1
 ```
-![image](https://user-images.githubusercontent.com/73699193/98183284-2d6c1b80-1f4b-11eb-90ad-c95c4df1f36a.png)
+![image](https://user-images.githubusercontent.com/52647474/98259835-eec77700-1fc5-11eb-9ac9-bab6a80a0bb0.png)
+
+![image](https://user-images.githubusercontent.com/52647474/98259741-d6575c80-1fc5-11eb-8335-e048a8a01333.png)
 
 
 
@@ -224,57 +226,74 @@ http POST http://gateway:8080/orders item=test qty=1
 
 - 결제서비스를 호출하기 위하여 FeignClient 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 ```
-# (app) external > PaymentService.java
+# (app) external > RewardService.java
+
 
 package phoneseller.external;
 
-@FeignClient(name="pay", url="${api.pay.url}")
-public interface PaymentService {
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-    @RequestMapping(method= RequestMethod.POST, path="/payments")
-    public void pay(@RequestBody Payment payment);
+import java.util.Date;
+
+@FeignClient(name="reward", url="${api.url.reward}")
+public interface RewardService {
+
+    @RequestMapping(method= RequestMethod.POST, path="/rewards")
+    public void payCancel(@RequestBody Reward reward);
 
 }
 ```
 ![image](https://user-images.githubusercontent.com/73699193/98065833-b1190000-1e98-11eb-9e44-84d4961011ed.png)
 
 
-- 주문을 받은 직후 결제를 요청하도록 처리
+- 결제취소를 받은 직후 Reward를 포인트를 회수 하도록 처리
 ```
-# (app) Order.java (Entity)
+# (pay) Payment.java (Entity)
+ @PreUpdate
+    public void onPreUpdate(){
+        if("OrderCancelled".equals(process)) {
+            System.out.println("***** 결재 취소 중 *****");
+            setProcess("PayCancelled");
+            setPrice((double) 0);
+            PayCancelled payCancelled = new PayCancelled();
+            BeanUtils.copyProperties(this, payCancelled);
+            payCancelled.publishAfterCommit();
 
-    @PostPersist
-    public void onPostPersist(){
-
-       phoneseller.external.Payment payment = new phoneseller.external.Payment();
-        payment.setOrderId(this.getId());
-        payment.setProcess("Ordered");
-        
-        AppApplication.applicationContext.getBean(phoneseller.external.PaymentService.class)
-            .pay(payment);
-    }
-```
-![image](https://user-images.githubusercontent.com/73699193/98066539-a6f80100-1e9a-11eb-8dd8-bf213d90e5fb.png)
-
-- 동기식 호출이 적용되서 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
-
-```
-#결제(pay) 서비스를 잠시 내려놓음 (ctrl+c)
-
-#주문하기(order)
-http http://localhost:8081/orders item=note20 qty=1   #Fail
-```
-![image](https://user-images.githubusercontent.com/73699193/98072284-04934a00-1ea9-11eb-9fad-40d3996e109f.png)
+            //Following code causes dependency to external APIs
+            // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+            phoneseller.external.Reward reward = new phoneseller.external.Reward();
+            reward.setOrderId(getOrderId());
+            reward.setPoint((double)-1);
+            reward.setProcess("PayCancelled");
+            // mappings goes here
+            PayApplication.applicationContext.getBean(phoneseller.external.RewardService.class)
+                    .payCancel(reward);
 
 ```
-#결제(pay) 서비스 재기동
+![image](https://user-images.githubusercontent.com/52647474/98260538-cb50fc00-1fc6-11eb-81f1-e681c0dde8b5.png)
+
+- 동기식 호출이 적용되서 Reward 시스템이 장애가 나면 결재 취소처리 불가능 하다는 것을 확인:
+
+```
+#Reward 서비스를 잠시 내려놓음 (ctrl+c)
+
+#결제취소하기(pay)
+http PATCH http://localhost:8083/payments/4 price=200 process="OrderCancelled"   #Fail
+```
+![image](https://user-images.githubusercontent.com/52647474/98262941-88dcee80-1fc9-11eb-906a-270a7e3e68c5.png)
+
+```
+#Reward 서비스 재기동
 cd pay
 mvn spring-boot:run
 
-#주문하기(order)
-http http://localhost:8081/orders item=note21 qty=2   #Success
+#결제취소하기(pay)
+http PATCH http://localhost:8083/payments/4 price=200 process="OrderCancelled"   #Success
 ```
-![image](https://user-images.githubusercontent.com/73699193/98074359-9f8e2300-1ead-11eb-8854-0449a65ff55c.png)
+![image](https://user-images.githubusercontent.com/52647474/98263170-d6595b80-1fc9-11eb-8b7b-cfc26a3d4f0d.png)
 
 
 
