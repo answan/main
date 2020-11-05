@@ -98,16 +98,16 @@ ver.Answan
 
 ### 컨텍스트 매핑 (점선은 Pub/Sub, 실선은 Req/Resp)
 
-![image](https://user-images.githubusercontent.com/73699193/97982527-45428300-1e17-11eb-8641-b658bab34fc6.png)
+![image](https://user-images.githubusercontent.com/52647474/98245367-288f8200-1fb4-11eb-8f12-239f7c7a86f2.png)
 
     - 컨텍스트 매핑하여 묶어줌.
     - 팀원 중 외국인이 투입되어 유비쿼터스 랭귀지인 영어로 변경	
 
 ### 완성된 모형
 
-![image](https://user-images.githubusercontent.com/73699193/97982584-60ad8e00-1e17-11eb-8fb6-af87b7c6ff91.png)
+![image](https://user-images.githubusercontent.com/52647474/98245482-54ab0300-1fb4-11eb-8bc6-bc5bdb403388.png)
 
-    - View Model 추가
+    - View Model 포함
 
 ### 기능적 요구사항 검증
 
