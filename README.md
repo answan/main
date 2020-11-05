@@ -56,14 +56,14 @@ ver.Answan
 
 
 ## Event Storming 결과
-* MSAEz 로 모델링한 이벤트스토밍 결과:  http://www.msaez.io/#/storming/G4Le38IyNmPdGV7UTxmqbVhBw8z1/share/fef3e793823083653eb1b4ef257a6bb3/-MLAUDjJIxzggM4AGxrE
+* MSAEz 로 모델링한 이벤트스토밍 결과:  http://www.msaez.io/#/storming/dukpFsKpNqU89oVjZp4DTcUnsXM2/share/f684312518e30472bbeaf470fa8fe6d3/-MLLAnpSdww_03eFjFnJ
 
 
 ### 이벤트 도출
-![image](https://user-images.githubusercontent.com/70673885/97949704-dc87e600-1dd7-11eb-9525-544b2411cc51.png)
+![image](https://user-images.githubusercontent.com/52647474/98241971-0d6e4380-1faf-11eb-9615-4dfd74f6581a.png)
 
 ### 부적격 이벤트 탈락
-![image](https://user-images.githubusercontent.com/70673885/97949767-0a6d2a80-1dd8-11eb-8c2f-fa445fa61418.png)
+
 
     - 과정중 도출된 잘못된 도메인 이벤트들을 걸러내는 작업을 수행함
 	- 폰종류가선택됨, 결제버튼클릭됨, 배송수량선택됨, 배송일자선택됨  :  UI 의 이벤트이지, 업무적인 의미의 이벤트가 아니라서 제외
@@ -86,7 +86,7 @@ ver.Answan
     - 도메인 서열 분리 
         - Core Domain:  app(front), store : 없어서는 안될 핵심 서비스이며, 연견 Up-time SLA 수준을 99.999% 목표, 배포주기는 app 의 경우 1주일 1회 미만, store 의 경우 1개월 1회 미만
         - Supporting Domain:  customer(view) : 경쟁력을 내기위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기는 각 팀의 자율이나 표준 스프린트 주기가 1주일 이므로 1주일 1회 이상을 기준으로 함.
-        - General Domain:  pay : 결제서비스로 3rd Party 외부 서비스를 사용하는 것이 경쟁력이 높음 
+        - General Domain: Reward, pay : 결제서비스와 Reward서비스로 3rd Party 외부 서비스를 사용하는 것이 경쟁력이 높음 
 
 ### 폴리시 부착 (괄호는 수행주체, 폴리시 부착을 둘째단계에서 해놔도 상관 없음. 전체 연계가 초기에 드러남)
 
