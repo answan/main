@@ -144,7 +144,7 @@ ver.Answan
 
 ## 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
 
-![image](https://user-images.githubusercontent.com/52647474/98247352-e3208400-1fb6-11eb-809e-04423c719ef1.png)
+![image](https://user-images.githubusercontent.com/52647474/98247802-6fcb4200-1fb7-11eb-87dc-9e5e7e32707d.png)
 
     - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
     - 호출관계에서 PubSub 과 Req/Resp 를 구분함
@@ -157,6 +157,9 @@ ver.Answan
 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 808n 이다)
 
 ```
+cd reward
+mvn spring-boot:run
+
 cd app
 mvn spring-boot:run
 
@@ -177,25 +180,25 @@ mvn spring-boot:run
 하지만, 일부 구현에 있어서 영문이 아닌 경우는 실행이 불가능한 경우가 있기 때문에 계속 사용할 방법은 아닌것 같다. 
 (Maven pom.xml, Kafka의 topic id, FeignClient 의 서비스 id 등은 한글로 식별자를 사용하는 경우 오류가 발생하는 것을 확인하였다)
 
-![image](https://user-images.githubusercontent.com/73699193/98182350-e2e99f80-1f48-11eb-825c-da099795fe29.png)
+![image](https://user-images.githubusercontent.com/52647474/98247962-a903b200-1fb7-11eb-9ce7-85dbbae4bafd.png)
 
 Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
 
-![image](https://user-images.githubusercontent.com/73699193/98182486-378d1a80-1f49-11eb-8e14-0de7296978b5.png)
+![image](https://user-images.githubusercontent.com/52647474/98248187-f122d480-1fb7-11eb-9c49-82560ccffe3a.png)
 
 
 ## 폴리글랏 퍼시스턴스
 대리점의 경우 H2 DB인 주문과 결제와 달리 Hsql으로 구현하여 MSA간 서로 다른 종류의 DB간에도 문제 없이 동작하여 다형성을 만족하는지 확인하였다. 
 
 
-app, pay, customer의 pom.xml 설정
+app, pay,store, customer의 pom.xml 설정
 
 ![image](https://user-images.githubusercontent.com/73699193/97972993-baf32280-1e08-11eb-8158-912e4d28d7ea.png)
 
 
-store의 pom.xml 설정
+reward의 pom.xml 설정
 
-![image](https://user-images.githubusercontent.com/73699193/97973735-e0346080-1e09-11eb-9636-605e2e870fb0.png)
+![image](https://user-images.githubusercontent.com/52647474/98248333-22030980-1fb8-11eb-9ab3-0edeb77ee4ef.png)
 
 
 
@@ -203,7 +206,7 @@ store의 pom.xml 설정
 
 gateway > applitcation.yml 설정
 
-![image](https://user-images.githubusercontent.com/73699193/98060621-5d54e980-1e8d-11eb-943c-692c5953c6a1.png)
+![image](https://user-images.githubusercontent.com/52647474/98248509-6098c400-1fb8-11eb-9f8d-df5492855827.png)
 
 gateway 테스트
 
