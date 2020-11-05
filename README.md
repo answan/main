@@ -111,39 +111,40 @@ ver.Answan
 
 ### 기능적 요구사항 검증
 
-![image](https://user-images.githubusercontent.com/73699193/97982759-96527700-1e17-11eb-9144-f95de1e0d01e.png)
+![image](https://user-images.githubusercontent.com/52647474/98245982-09452480-1fb5-11eb-9aa9-b5bf29ca641c.png)
 
    	- 고객이 APP에서 폰을 주문한다. (ok)
    	- 고객이 결제한다. (ok)
-	- 결제가 되면 주문 내역이 대리점에 전달된다. (ok)
-	- 대리점에 주문 정보가 도착하면 배송한다. (ok)
-	- 배송이 되면 APP에서 배송상태를 조회할 수 있다. (ok)
+	- 결제가 되면 결제완료 내역이 Reward에 전달된다. (ok)
+	- Reward에 결제완료 정보가 도착하면 Reward를 지급 한다. (ok)
+	- Reward지급이 되면 APP에서 Reward를 조회할 수 있다. (ok)
 
-![image](https://user-images.githubusercontent.com/73699193/97982841-b2eeaf00-1e17-11eb-9f09-9b74f85a96ca.png)
+![image](https://user-images.githubusercontent.com/52647474/98246085-25e15c80-1fb5-11eb-861e-ed0255bdbf28.png)
 
 	- 고객이 주문을 취소할 수 있다. (ok)
-	- 주문이 취소되면 결제가 취소된다. (ok)
-	- 고객이 결제상태를 APP에서  조회 할 수 있다. (ok)
+	- 결재가 취소되면 Reward가 취소된다. (ok)
+	- 고객이 Reward를 APP에서  조회 할 수 있다. (ok)
 
-![image](https://user-images.githubusercontent.com/73699193/97982928-d3b70480-1e17-11eb-957e-6a9093d2a0d7.png)
+![image](https://user-images.githubusercontent.com/52647474/98246348-896b8a00-1fb5-11eb-8cce-4a9476a6ba73.png)
   
 	- 고객이 모든 진행내역을 볼 수 있어야 한다. (ok)
 
 
 ### 비기능 요구사항 검증
 
-![image](https://user-images.githubusercontent.com/73699193/97983019-f6e1b400-1e17-11eb-86ef-d43873ccbb7d.png)
+![image](https://user-images.githubusercontent.com/52647474/98246898-44942300-1fb6-11eb-8ca4-bf99838feb6e.png)
 
-    - 1) 결제가 되지 않은 주문건은 아예 거래가 성립되지 않아야 한다. (Req/Res)
-    - 2) 대리점관리 기능이 수행되지 않더라도 주문은 365일 24시간 받을 수 있어야 한다. (Pub/sub)
-    - 3) 결제시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도한다. (Circuit breaker)
-    - 4) 주문이 취소되면 결제가 취소되고 주문정보에 업데이트가 되어야 한다.  (SAGA, 보상트렌젝션)
-    - 5) 고객이 모든 진행내역을 조회 할 수 있도록 성능을 고려하여 별도의 view로 구성한다. (CQRS, DML/SELECT 분리)
+    - 1) 결제가 취소되지 않은건은 Reward를 회수할수 없어야한다. (Req/Res)
+    - 2) Reward관리 기능이 수행되지 않더라도 주문은 365일 24시간 받을 수 있어야 한다. (Pub/sub)
+    - 3) Reward시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도한다. (Circuit breaker)
+    - 4) 결제가 완료되면 Rewar가 지급되고 주문정보에 업데이트가 되어야 한다.  (SAGA, 보상트렌젝션)
+    - 5) 고객이 모든 진행내역을 조회 할 수 있도록 성능을 고려하여 별도의 view로 구성한다. (CQRS, DML/SELECT 분리)결제가 취소되면 Reward는 무조건 회수한다.> Sync 호출(개인)
+
 
 
 ## 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
 
-![image](https://user-images.githubusercontent.com/73699193/98181638-162b2f00-1f47-11eb-81af-0b71ff811e1c.png)
+![image](https://user-images.githubusercontent.com/52647474/98247352-e3208400-1fb6-11eb-809e-04423c719ef1.png)
 
     - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
     - 호출관계에서 PubSub 과 Req/Resp 를 구분함
