@@ -1,7 +1,7 @@
 [httpie 설치]
 
 
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl apply -n phone82 -f -
 apiVersion: "v1"
 kind: "Pod"
 metadata: 
