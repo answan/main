@@ -1,5 +1,5 @@
 ![image](https://user-images.githubusercontent.com/70673885/97950284-bcf1bd00-1dd9-11eb-8c8a-b3459c710849.png)
-ver.Answan
+ver.Reward
 
 # 서비스 시나리오
 
@@ -543,78 +543,77 @@ root@labs--843883669:~/phone82/reward# kubectl set image deploy reward reward=ad
 
 ## Config Map
 
-- apllication.yml 설정
+```- apllication.yml 설정
 
 * default쪽
 
-![image](https://user-images.githubusercontent.com/73699193/98108335-1c85c080-1edf-11eb-9d0f-1f69e592bb1d.png)
+![image](https://user-images.githubusercontent.com/52647474/98326914-b790ae80-2035-11eb-855e-03783b9140e1.png)
 
 * docker 쪽
 
-![image](https://user-images.githubusercontent.com/73699193/98108645-ad5c9c00-1edf-11eb-8d54-487d2262e8af.png)
-
+![image](https://user-images.githubusercontent.com/52647474/98327009-f0308800-2035-11eb-967b-36bc62144e4c.png)
+```
 - Deployment.yml 설정
 
-![image](https://user-images.githubusercontent.com/73699193/98108902-12b08d00-1ee0-11eb-8f8a-3a3ea82a635c.png)
+![image](https://user-images.githubusercontent.com/52647474/98327067-0fc7b080-2036-11eb-9612-21f71174be25.png)
 
 - config map 생성 후 조회
 ```
 kubectl create configmap apiurl --from-literal=url=http://pay:8080 --from-literal=fluentd-server-ip=10.xxx.xxx.xxx -n phone82
 ```
-![image](https://user-images.githubusercontent.com/73699193/98107784-5bffdd00-1ede-11eb-8da6-82dbead0d64f.png)
+![image](https://user-images.githubusercontent.com/52647474/98327599-44883780-2037-11eb-804c-58539a20bc30.png)
+![image](https://user-images.githubusercontent.com/52647474/98327707-8a450000-2037-11eb-98ed-56724bcc23cc.png)
 
 - 설정한 url로 주문 호출
 ```
-http POST http://app:8080/orders item=dfdf1 qty=21
+http  http://gateway:8080/rewards 
 ```
 
-![image](https://user-images.githubusercontent.com/73699193/98109319-b732cf00-1ee0-11eb-9e92-ad0e26e398ec.png)
+![image](https://user-images.githubusercontent.com/52647474/98327866-e0b23e80-2037-11eb-9e03-2477bea15118.png)
+
 
 - configmap 삭제 후 app 서비스 재시작
 ```
 kubectl delete configmap apiurl -n phone82
 kubectl get pod/app-56f677d458-5gqf2 -n phone82 -o yaml | kubectl replace --force -f-
 ```
-![image](https://user-images.githubusercontent.com/73699193/98110005-cf571e00-1ee1-11eb-973f-2f4922f8833c.png)
+![image](https://user-images.githubusercontent.com/52647474/98328122-5ae2c300-2038-11eb-9c52-12ffd07d24d6.png)
 
 - configmap 삭제된 상태에서 주문 호출   
 ```
 http POST http://app:8080/orders item=dfdf2 qty=22
 ```
-![image](https://user-images.githubusercontent.com/73699193/98110323-42f92b00-1ee2-11eb-90f3-fe8044085e9d.png)
-
-![image](https://user-images.githubusercontent.com/73699193/98110445-720f9c80-1ee2-11eb-851e-adcd1f2f7851.png)
-
-![image](https://user-images.githubusercontent.com/73699193/98110782-f4985c00-1ee2-11eb-97a7-1fed3c6b042c.png)
+![image](https://user-images.githubusercontent.com/52647474/98328423-1146a800-2039-11eb-8e6f-0a6925d633c2.png)
 
 
 
 ## Self-healing (Liveness Probe)
 
-- store 서비스 정상 확인
+- reward 서비스 정상 확인
 
-![image](https://user-images.githubusercontent.com/27958588/98096336-fb1cd880-1ece-11eb-9b99-3d704cd55fd2.jpg)
+![image](https://user-images.githubusercontent.com/52647474/98328471-29b6c280-2039-11eb-82a8-87fafe85a510.png)
+
 
 
 - deployment.yml 에 Liveness Probe 옵션 추가
 ```
-cd ~/phone82/store/kubernetes
+cd ~/phone82/reward/kubernetes
 vi deployment.yml
 
 (아래 설정 변경)
 livenessProbe:
 	tcpSocket:
 	  port: 8081
-	initialDelaySeconds: 5
+	initialDelaySeconds: 120
 	periodSeconds: 5
 ```
-![image](https://user-images.githubusercontent.com/27958588/98096375-0839c780-1ecf-11eb-85fb-00e8252aa84a.jpg)
+![image](https://user-images.githubusercontent.com/52647474/98328885-27089d00-203a-11eb-8ccf-3f0728319323.png)
 
-- store pod에 liveness가 적용된 부분 확인
+- reward pod에 liveness가 적용된 부분 확인
 
-![image](https://user-images.githubusercontent.com/27958588/98096393-0a9c2180-1ecf-11eb-8ac5-f6048160961d.jpg)
+![image](https://user-images.githubusercontent.com/52647474/98329614-f6c1fe00-203b-11eb-9448-dc6ad3bae97a.png)
 
-- store 서비스의 liveness가 발동되어 13번 retry 시도 한 부분 확인
+- reward 서비스의 liveness가 발동되어 retry 시도 한 부분 확인
 
-![image](https://user-images.githubusercontent.com/27958588/98096461-20a9e200-1ecf-11eb-8b02-364162baa355.jpg)
+![image](https://user-images.githubusercontent.com/52647474/98329667-1a854400-203c-11eb-9818-e2aecfe5738d.png)
 
