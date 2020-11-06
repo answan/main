@@ -175,7 +175,7 @@ mvn spring-boot:run
 
 ## DDD 의 적용
 
-각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 app 마이크로 서비스). 
+각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 Reward 마이크로 서비스). 
 이때 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용하려고 노력했다. 
 하지만, 일부 구현에 있어서 영문이 아닌 경우는 실행이 불가능한 경우가 있기 때문에 계속 사용할 방법은 아닌것 같다. 
 (Maven pom.xml, Kafka의 topic id, FeignClient 의 서비스 id 등은 한글로 식별자를 사용하는 경우 오류가 발생하는 것을 확인하였다)
@@ -221,12 +221,12 @@ http POST http://gateway:8080/orders item=test qty=1
 
 ## 동기식 호출 과 Fallback 처리
 
-분석단계에서의 조건 중 하나로 주문(app)->결제(pay) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 
+분석단계에서의 조건 중 하나로 결제(pay)->Reward 간의 결제취소 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 
 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
 
-- 결제서비스를 호출하기 위하여 FeignClient 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
+- Reward서비스를 호출하기 위하여 FeignClient 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 ```
-# (app) external > RewardService.java
+# (reward) external > RewardService.java
 
 
 package phoneseller.external;
@@ -300,39 +300,41 @@ http PATCH http://localhost:8083/payments/4 price=200 process="OrderCancelled"  
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 
 
 
-결제(pay)가 이루어진 후에 대리점(store)으로 이를 알려주는 행위는 비 동기식으로 처리하여 대리점(store)의 처리를 위하여 결제주문이 블로킹 되지 않아도록 처리한다.
+결제(pay)가 이루어진 후에 Reward(store)으로 이를 알려주는 행위는 비 동기식으로 처리하여 Reward의 처리를 위하여 결제주문이 블로킹 되지 않도록 처리한다.
  
 - 결제승인이 되었다(payCompleted)는 도메인 이벤트를 카프카로 송출한다(Publish)
  
-![image](https://user-images.githubusercontent.com/73699193/98075277-6f478400-1eaf-11eb-88c8-2b4a7736e56b.png)
+![image](https://user-images.githubusercontent.com/52647474/98311688-56f07a00-2013-11eb-8e58-aff56ace7723.png)
 
 
-- 대리점(store)에서는 결제승인(payCompleted) 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다.
-- 주문접수(OrderReceive)는 송출된 결제승인(payCompleted) 정보를 store의 Repository에 저장한다.:
+- Reward에서는 결제승인(payCompleted) 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다.
+- 결제완료(OrderReceive)는 송출된 결제승인(payCompleted) 정보를 reward Repository에 저장한다.:
  
-![image](https://user-images.githubusercontent.com/73699193/98076059-e0d40200-1eb0-11eb-94ad-c4ea114cb3aa.png)
+![image](https://user-images.githubusercontent.com/52647474/98312150-6b814200-2014-11eb-9c1f-3df1924a67c9.png)
 
 
-대리점(store)시스템은 주문(app)/결제(pay)와 완전히 분리되어있으며(sync transaction 없음), 이벤트 수신에 따라 처리되기 때문에, 대리점(store)이 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
+Reward시스템은 주문(app)/결제(pay)와 주문 프로세스 진행시 완전히 분리되어있으며(비동기 transaction 방식), 이벤트 수신에 따라 처리되기 때문에, Reward 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
 ```
-# 대리점(store) 서비스를 잠시 내려놓음 (ctrl+c)
+# Reward 서비스를 잠시 내려놓음 (ctrl+c)
 
 #주문하기(order)
-http http://localhost:8081/orders item=note30 qty=2  #Success
+http http://localhost:8081/orders item="GX Note99" qty=2 price=990000  #Success
+![image](https://user-images.githubusercontent.com/52647474/98313378-024efe00-2017-11eb-9687-1f74803ff861.png)
 
 #주문상태 확인
-http get http://localhost:8081/orders    # 상태값이 'Shipped'이 아닌 'Payed'에서 멈춤을 확인
+
+http get http://localhost:8081/orders    # 값중 Reward에서 전송해주는 point 값이 비어있고 나머지 서비스들은 정상작동하여 status가 "shipped"로 변경되어야한다.
 ```
-![image](https://user-images.githubusercontent.com/73699193/98078301-2b577d80-1eb5-11eb-9d89-7c03a3fa27dd.png)
+![image](https://user-images.githubusercontent.com/52647474/98313550-712c5700-2017-11eb-98e6-413bb27a6cd4.png)
 ```
-#대리점(store) 서비스 기동
+#Reward 서비스 기동
 cd store
 mvn spring-boot:run
 
 #주문상태 확인
-http get http://localhost:8081/orders     # 'Payed' 였던 상태값이 'Shipped'로 변경된 것을 확인
+http get http://localhost:8081/orders     # 비어있었던 point 값이 입력된 것을 확인
 ```
-![image](https://user-images.githubusercontent.com/73699193/98078837-2cd57580-1eb6-11eb-8850-a8c621410d61.png)
+![image](https://user-images.githubusercontent.com/52647474/98313747-dda75600-2017-11eb-9531-44080efb2210.png)
 
 # 운영
 
