@@ -450,7 +450,7 @@ hystrix:
 ```
  siege -c100 -t120S -r10 -v --content-type "application/json" 'http://pay:8080/payments/ POST {"orderId":1, "process":"OrderCancelled"}'
 ```
-- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 reward에서 처리되면서 다시 pay를 받기 시작 
+- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 reward에서 처리되면서 다시 요청을 받기 시작 
 
 ![image](https://user-images.githubusercontent.com/73699193/98098702-07eefb80-1ed2-11eb-94bf-316df4bf682b.png)
 
@@ -483,7 +483,7 @@ kubectl autoscale deploy reward --min=1 --max=10 --cpu-percent=15 -n phone82
 kubectl exec -it pod/siege-5c7c46b788-4rn4r -c siege -n phone82 -- /bin/bash
 siege -c100 -t120S -r10 -v --content-type "application/json" 'http://reward:8080/rewards/3 PATCH {"process":"Cancelled"}'
 ```
-![image](https://user-images.githubusercontent.com/73699193/98102543-0d9b1000-1ed7-11eb-9cb6-91d7996fc1fd.png)
+![image](https://user-images.githubusercontent.com/52647474/98324528-dc822300-202f-11eb-8917-e787a60db2a6.png)
 
 - 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
 ```
@@ -512,12 +512,12 @@ kubectl apply -f kubernetes/deployment_readiness.yml
 ```
 - readiness 옵션이 없는 경우 배포 중 서비스 요청처리 실패
 
-![image](https://user-images.githubusercontent.com/73699193/98105334-2a394700-1edb-11eb-9633-f5c33c5dee9f.png)
+![image](https://user-images.githubusercontent.com/52647474/98325130-6aaad900-2031-11eb-8b4a-1b712fe95983.png)
 
 
 - deployment.yml에 readiness 옵션을 추가 
 
-![image](https://user-images.githubusercontent.com/73699193/98107176-75ecf000-1edd-11eb-88df-617c870b49fb.png)
+![image](https://user-images.githubusercontent.com/52647474/98325024-28819780-2031-11eb-89a4-d5929bd38113.png)
 
 - readiness적용된 deployment.yml 적용
 
@@ -527,16 +527,17 @@ kubectl apply -f kubernetes/deployment.yml
 - 새로운 버전의 이미지로 교체
 ```
 cd acr
-az acr build --registry admin02 --image admin02.azurecr.io/store:v4 .
-kubectl set image deploy store store=admin02.azurecr.io/store:v4 -n phone82
+root@labs--843883669:~/phone82/reward# az acr build --registry admin22 --image admin22.azurecr.io/reward:v1 .
+root@labs--843883669:~/phone82/reward# kubectl set image deploy reward reward=admin22.azurecr.io/reward:v1 -n phone82
 ```
-- 기존 버전과 새 버전의 store pod 공존 중
+- 기존 버전과 새 버전의 reward pod 공존 중
 
-![image](https://user-images.githubusercontent.com/73699193/98106161-65884580-1edc-11eb-9540-17a3c9bdebf3.png)
+![image](https://user-images.githubusercontent.com/52647474/98325527-5adfc480-2032-11eb-9c77-a6af2f15b476.png)
 
 - Availability: 100.00 % 확인
 
-![image](https://user-images.githubusercontent.com/73699193/98106524-c152ce80-1edc-11eb-8e0f-3731ca2f709d.png)
+![image](https://user-images.githubusercontent.com/52647474/98325653-a7c39b00-2032-11eb-8e5c-32491cde2e36.png)
+
 
 
 
