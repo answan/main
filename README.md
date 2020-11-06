@@ -432,7 +432,8 @@ hystrix:
 
 ```
 ![image](https://user-images.githubusercontent.com/52647474/98315760-590b0680-201c-11eb-8ed8-cb1d569eb256.png)
-
+![image](https://user-images.githubusercontent.com/52647474/98318991-1bf64280-2023-11eb-9cdd-249761125ce0.png)
+![image](https://user-images.githubusercontent.com/52647474/98318963-0e40bd00-2023-11eb-9f50-80dd64b378a0.png)
 
 * siege 툴 사용법:
 ```
