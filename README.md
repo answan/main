@@ -345,33 +345,32 @@ http get http://localhost:8081/orders     # 비어있었던 point 값이 입력�
 kubectl create ns phone82
 kubectl get ns
 ```
-![image](https://user-images.githubusercontent.com/73699193/97960790-6d20ef00-1df5-11eb-998d-d5591975b5d4.png)
+![image](https://user-images.githubusercontent.com/52647474/98314504-6ffc2980-2019-11eb-9d38-852041bb7fe1.png)
 
 - 폴더 만들기, 해당폴더로 이동
 ```
 mkdir phone82
 cd phone 82
 ```
-![image](https://user-images.githubusercontent.com/73699193/97961127-0ea84080-1df6-11eb-81b3-1d5e460d4c0f.png)
+![image](https://user-images.githubusercontent.com/52647474/98314552-8e622500-2019-11eb-9d2b-f3df0c728861.png)
 
 - 소스 가져오기
 ```
 git clone https://github.com/phone82/app.git
 ```
-![image](https://user-images.githubusercontent.com/73699193/98089346-eb4cc680-1ec5-11eb-9c23-f6987dee9308.png)
 
 - 빌드하기
 ```
 cd app
 mvn package -Dmaven.test.skip=true
 ```
-![image](https://user-images.githubusercontent.com/73699193/98089442-19320b00-1ec6-11eb-88b5-544cd123d62a.png)
+![image](https://user-images.githubusercontent.com/52647474/98314628-c10c1d80-2019-11eb-8820-fa7e12d263cf.png)
 
 - 도커라이징: Azure 레지스트리에 도커 이미지 푸시하기
 ```
-az acr build --registry admin02 --image admin02.azurecr.io/app:latest .
+az acr build --registry admin02 --image admin22.azurecr.io/app:latest .
 ```
-![image](https://user-images.githubusercontent.com/73699193/98089685-6dd58600-1ec6-11eb-8fb9-80705c854c7b.png)
+![image](https://user-images.githubusercontent.com/52647474/98314702-ea2cae00-2019-11eb-8601-9e0c71b4bd49.png)
 
 - 컨테이너라이징: 디플로이 생성 확인
 ```
@@ -387,7 +386,7 @@ kubectl get all -n phone82
 ```
 ![image](https://user-images.githubusercontent.com/73699193/98090693-b80b3700-1ec7-11eb-959e-fc0ce94663aa.png)
 
-- pay, store, customer, gateway에도 동일한 작업 반복
+- pay, store, customer,reward, gateway에도 동일한 작업 반복
 
 
 
@@ -402,7 +401,8 @@ readiness 설정 (무정지 배포)
 liveness 설정 (self-healing)
 resource 설정 (autoscaling)
 ```
-![image](https://user-images.githubusercontent.com/73699193/98092861-8182eb80-1eca-11eb-87c5-afa22140ebad.png)
+![image](https://user-images.githubusercontent.com/52647474/98315555-c9655800-201b-11eb-899f-c44d1d5a9be9.png)
+
 
 - deployment.yml로 서비스 배포
 ```
@@ -410,11 +410,12 @@ cd app
 kubectl apply -f kubernetes/deployment.yml
 ```
 
+
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-시나리오는 단말앱(app)-->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
+시나리오는 결제(pay)->Reward 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
@@ -430,7 +431,8 @@ hystrix:
       execution.isolation.thread.timeoutInMilliseconds: 610
 
 ```
-![image](https://user-images.githubusercontent.com/73699193/98093705-a166df00-1ecb-11eb-83b5-f42e554f7ffd.png)
+![image](https://user-images.githubusercontent.com/52647474/98315760-590b0680-201c-11eb-8ed8-cb1d569eb256.png)
+
 
 * siege 툴 사용법:
 ```
@@ -461,25 +463,25 @@ siege -c100 -t60S -r10 -v --content-type "application/json" 'http://app:8080/ord
 
 ### 오토스케일 아웃
 
-- 대리점 시스템에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
+- Reward 시스템에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
 
 ```
 # autocale out 설정
 store > deployment.yml 설정
 ```
-![image](https://user-images.githubusercontent.com/73699193/98187434-44fbd200-1f54-11eb-9859-daf26f812788.png)
+![image](https://user-images.githubusercontent.com/52647474/98317941-d769a780-2020-11eb-87be-38f875e279cd.png)
 
 ```
-kubectl autoscale deploy store --min=1 --max=10 --cpu-percent=15 -n phone82
+kubectl autoscale deploy reward --min=1 --max=10 --cpu-percent=15 -n phone82
 ```
-![image](https://user-images.githubusercontent.com/73699193/98100149-ce1ef480-1ed3-11eb-908e-a75b669d611d.png)
+![image](https://user-images.githubusercontent.com/52647474/98318004-fc5e1a80-2020-11eb-9a4b-b60a58077242.png)
 
 
 -
 - CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
 ```
 kubectl exec -it pod/siege-5c7c46b788-4rn4r -c siege -n phone82 -- /bin/bash
-siege -c100 -t120S -r10 -v --content-type "application/json" 'http://store:8080/storeManages POST {"orderId":"456", "process":"Payed"}'
+siege -c100 -t120S -r10 -v --content-type "application/json" 'http://reward:8080/rewards/3 PATCH {"process":"Cancelled"}'
 ```
 ![image](https://user-images.githubusercontent.com/73699193/98102543-0d9b1000-1ed7-11eb-9cb6-91d7996fc1fd.png)
 
@@ -487,14 +489,16 @@ siege -c100 -t120S -r10 -v --content-type "application/json" 'http://store:8080/
 ```
 kubectl get deploy store -w -n phone82
 ```
+![image](https://user-images.githubusercontent.com/52647474/98318963-0e40bd00-2023-11eb-9f50-80dd64b378a0.png)
+
 - 어느정도 시간이 흐른 후 스케일 아웃이 벌어지는 것을 확인할 수 있다. max=10 
 - 부하를 줄이니 늘어난 스케일이 점점 줄어들었다.
 
-![image](https://user-images.githubusercontent.com/73699193/98102926-92862980-1ed7-11eb-8f19-a673d72da580.png)
+![image](https://user-images.githubusercontent.com/52647474/98319363-f1f15000-2023-11eb-9aae-7e45e46b5f5f.png)
 
 - 다시 부하를 주고 확인하니 Availability가 높아진 것을 확인 할 수 있었다.
 
-![image](https://user-images.githubusercontent.com/73699193/98103249-14765280-1ed8-11eb-8c7c-9ea1c67e03cf.png)
+![image](https://user-images.githubusercontent.com/52647474/98319633-86f44900-2024-11eb-95fe-f09e08cd420b.png)
 
 
 ## 무정지 재배포
