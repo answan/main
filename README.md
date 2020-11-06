@@ -278,7 +278,7 @@ public interface RewardService {
 - 동기식 호출이 적용되서 Reward 시스템이 장애가 나면 결재 취소처리 불가능 하다는 것을 확인:
 
 ```
-#Reward 서비스를 잠시 내려놓음 (ctrl+c)
+#Reward 서비스를 잠시 내려놓음
 
 #결제취소하기(pay)
 http PATCH http://localhost:8083/payments/4 price=200 process="OrderCancelled"   #Fail
@@ -315,7 +315,7 @@ http PATCH http://localhost:8083/payments/4 price=200 process="OrderCancelled"  
 
 Reward시스템은 주문(app)/결제(pay)와 주문 프로세스 진행시 완전히 분리되어있으며(비동기 transaction 방식), 이벤트 수신에 따라 처리되기 때문에, Reward 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
 ```
-# Reward 서비스를 잠시 내려놓음 (ctrl+c)
+# Reward 서비스를 잠시 내려놓음
 
 #주문하기(order)
 http http://localhost:8081/orders item="GX Note99" qty=2 price=990000  #Success
