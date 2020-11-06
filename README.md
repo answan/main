@@ -94,7 +94,7 @@ ver.Reward
 
 ### 폴리시의 이동
 
-![image](https://user-images.githubusercontent.com/52647474/98244875-72c43380-1fb3-11eb-8b68-09b052c7f1df.png)
+![image](https://user-images.githubusercontent.com/52647474/98333722-b74bdf80-2044-11eb-94d3-af3c1ff56301.png)
 
 ### 컨텍스트 매핑 (점선은 Pub/Sub, 실선은 Req/Resp)
 
