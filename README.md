@@ -374,17 +374,18 @@ az acr build --registry admin02 --image admin22.azurecr.io/app:latest .
 
 - 컨테이너라이징: 디플로이 생성 확인
 ```
-kubectl create deploy app --image=admin02.azurecr.io/app:latest -n phone82
+kubectl create deploy reward --image=admin02.azurecr.io/reward:latest -n phone82
 kubectl get all -n phone82
 ```
-![image](https://user-images.githubusercontent.com/73699193/98090560-83977b00-1ec7-11eb-9770-9cfe1021f0b4.png)
+![image](https://user-images.githubusercontent.com/52647474/98323933-57e2d500-202e-11eb-84ac-aa1b778186f2.png)
+
 
 - 컨테이너라이징: 서비스 생성 확인
 ```
-kubectl expose deploy app --type="ClusterIP" --port=8080 -n phone82
+kubectl expose deploy reward --type="ClusterIP" --port=8080 -n phone82
 kubectl get all -n phone82
 ```
-![image](https://user-images.githubusercontent.com/73699193/98090693-b80b3700-1ec7-11eb-959e-fc0ce94663aa.png)
+![image](https://user-images.githubusercontent.com/52647474/98323986-70eb8600-202e-11eb-9e07-3e76f93fba1d.png)
 
 - pay, store, customer,reward, gateway에도 동일한 작업 반복
 
@@ -432,8 +433,6 @@ hystrix:
 
 ```
 ![image](https://user-images.githubusercontent.com/52647474/98315760-590b0680-201c-11eb-8ed8-cb1d569eb256.png)
-![image](https://user-images.githubusercontent.com/52647474/98318991-1bf64280-2023-11eb-9cdd-249761125ce0.png)
-![image](https://user-images.githubusercontent.com/52647474/98318963-0e40bd00-2023-11eb-9f50-80dd64b378a0.png)
 
 * siege 툴 사용법:
 ```
@@ -446,12 +445,12 @@ hystrix:
 ```
 * 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
 - 동시사용자 100명
-- 60초 동안 실시
+- 120초 동안 실시
 
 ```
-siege -c100 -t60S -r10 -v --content-type "application/json" 'http://app:8080/orders POST {"item": "abc123", "qty":3}'
+ siege -c100 -t120S -r10 -v --content-type "application/json" 'http://pay:8080/payments/ POST {"orderId":1, "process":"OrderCancelled"}'
 ```
-- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 pay에서 처리되면서 다시 order를 받기 시작 
+- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 reward에서 처리되면서 다시 pay를 받기 시작 
 
 ![image](https://user-images.githubusercontent.com/73699193/98098702-07eefb80-1ed2-11eb-94bf-316df4bf682b.png)
 
@@ -468,7 +467,7 @@ siege -c100 -t60S -r10 -v --content-type "application/json" 'http://app:8080/ord
 
 ```
 # autocale out 설정
-store > deployment.yml 설정
+reward > deployment.yml 설정
 ```
 ![image](https://user-images.githubusercontent.com/52647474/98317941-d769a780-2020-11eb-87be-38f875e279cd.png)
 
