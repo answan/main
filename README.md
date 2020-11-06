@@ -313,7 +313,7 @@ http PATCH http://localhost:8083/payments/4 price=200 process="OrderCancelled"  
 ![image](https://user-images.githubusercontent.com/52647474/98312150-6b814200-2014-11eb-9c1f-3df1924a67c9.png)
 
 
-Reward시스템은 주문(app)/결제(pay)와 주문 프로세스 진행시 완전히 분리되어있으며(비동기 transaction 방식), 이벤트 수신에 따라 처리되기 때문에, Reward 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
+Reward시스템은 주문(app)/결제(pay)와 주문 프로세스 진행시 완전히 분리되어있으며(sync transaction 없음), 이벤트 수신에 따라 처리되기 때문에, Reward 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
 ```
 # Reward 서비스를 잠시 내려놓음
 
@@ -452,11 +452,11 @@ hystrix:
 ```
 - 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 reward에서 처리되면서 다시 요청을 받기 시작 
 
-![image](https://user-images.githubusercontent.com/73699193/98098702-07eefb80-1ed2-11eb-94bf-316df4bf682b.png)
+![image](https://user-images.githubusercontent.com/52647474/98331875-d8aacc80-2040-11eb-8a5c-e0eaaa86bcd8.png)
 
 - report
 
-![image](https://user-images.githubusercontent.com/73699193/98099047-6e741980-1ed2-11eb-9c55-6fe603e52f8b.png)
+![image](https://user-images.githubusercontent.com/52647474/98331966-0db71f00-2041-11eb-94ab-23e583474b49.png)
 
 - CB 잘 적용됨을 확인
 
@@ -483,7 +483,6 @@ kubectl autoscale deploy reward --min=1 --max=10 --cpu-percent=15 -n phone82
 kubectl exec -it pod/siege-5c7c46b788-4rn4r -c siege -n phone82 -- /bin/bash
 siege -c100 -t120S -r10 -v --content-type "application/json" 'http://reward:8080/rewards/3 PATCH {"process":"Cancelled"}'
 ```
-![image](https://user-images.githubusercontent.com/52647474/98324528-dc822300-202f-11eb-8917-e787a60db2a6.png)
 
 - 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
 ```
@@ -498,7 +497,7 @@ kubectl get deploy store -w -n phone82
 
 - 다시 부하를 주고 확인하니 Availability가 높아진 것을 확인 할 수 있었다.
 
-![image](https://user-images.githubusercontent.com/52647474/98319633-86f44900-2024-11eb-95fe-f09e08cd420b.png)
+![image](https://user-images.githubusercontent.com/52647474/98332162-77372d80-2041-11eb-9931-f59f20c64f35.png)
 
 
 ## 무정지 재배포
